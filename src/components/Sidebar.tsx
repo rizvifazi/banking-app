@@ -1,4 +1,4 @@
-import { Home, CreditCard, DollarSign, PieChart, Phone } from 'lucide-react'
+import { Home, CreditCard, DollarSign, PieChart, Phone, Info } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 
 export default function Sidebar({ activeTab, setActiveTab, className = "" }: { activeTab: string, setActiveTab: (tab: string) => void, className?: string }) {
@@ -6,7 +6,9 @@ export default function Sidebar({ activeTab, setActiveTab, className = "" }: { a
     <Button
       variant={activeTab === label.toLowerCase() ? 'secondary' : 'ghost'}
       className="w-full justify-start"
-      onClick={() => setActiveTab(label.toLowerCase())}
+      onClick={() => {
+        setActiveTab(label.toLowerCase().replace(/\s+/g, '-'))
+      }}
     >
       <Icon className="mr-2 h-4 w-4" />
       {label}
@@ -21,6 +23,7 @@ export default function Sidebar({ activeTab, setActiveTab, className = "" }: { a
         <NavItem icon={DollarSign} label="Payments" />
         <NavItem icon={PieChart} label="Investments" />
         <NavItem icon={Phone} label="Contact" />
+        <NavItem icon={Info} label="App Info" />
       </nav>
     </aside>
   )
