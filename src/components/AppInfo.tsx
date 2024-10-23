@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import PrivacyPolicyModal from '@/components/PrivacyPolicyModal'
+import TOSModal from '@/components/TOSModal'
 
 export default function AppInfo() {
+
     const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false)
-    const [showTermsOfService, setShowTermsOfService] = useState(false)
-    
+    const [showTOS, setShowTOS] = useState(false)
+
     return (
         <div className="space-y-6">
             <Card>
@@ -57,11 +60,21 @@ export default function AppInfo() {
                                 By using the Personal Banking App, you agree to our Terms of Service. These terms outline the rules and regulations
                                 for the use of our app and the services we provide.
                             </p>
-                            <Button variant="link" className="p-0 h-auto mt-2" onClick={() => setShowTermsOfService(true)}>Read Terms of Service</Button>
+                            <Button variant="link" className="p-0 h-auto mt-2" onClick={() => setShowTOS(true)}>Read Terms of Service</Button>
                         </div>
                     </div>
                 </CardContent>
             </Card>
+            
+            <PrivacyPolicyModal 
+                show={showPrivacyPolicy} 
+                onClose={() => setShowPrivacyPolicy(false)} 
+            />
+
+            <TOSModal
+                show={showTOS} 
+                onClose={() => setShowTOS(false)} 
+            />
         </div>
     )
 }

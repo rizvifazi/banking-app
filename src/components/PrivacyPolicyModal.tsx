@@ -1,12 +1,17 @@
-import { useState } from 'react';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
-export default function PrivacyPolicy(showPrivacyPolicy={showPrivacyPolicy}, setShowPrivacyPolicy={setShowPrivacyPolicy}) {
+interface PrivacyPolicyModalProps {
+  show: boolean
+  onClose: () => void
+}
+
+
+export default function PrivacyPolicy({show, onClose}:PrivacyPolicyModalProps) {
 
   return (
-    <Dialog open={showPrivacyPolicy} onOpenChange={setShowPrivacyPolicy}>
+    <Dialog open={show} onOpenChange={onClose}>
         <DialogContent className="sm:max-w-[600px] max-h-[80vh]">
           <DialogHeader>
             <DialogTitle>Privacy Policy</DialogTitle>
@@ -47,7 +52,7 @@ export default function PrivacyPolicy(showPrivacyPolicy={showPrivacyPolicy}, set
             </div>
           </ScrollArea>
           <DialogFooter>
-            <Button onClick={() => setShowPrivacyPolicy(false)}>Close</Button>
+          <Button onClick={onClose}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
