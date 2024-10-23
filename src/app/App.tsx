@@ -1,9 +1,12 @@
 "use client";
 
-import { useState } from 'react'
-import { Bell, User, LogOut, Menu } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Bell, User, LogOut, Menu , Check} from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Badge } from "@/components/ui/badge"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import LoginForm from '@/components/LoginForm'
 import Sidebar from '@/components/Sidebar'
 import Dashboard from '@/components/Dashboard'
@@ -16,6 +19,8 @@ import OTPModal from '@/components/OTPModal'
 import ReceiptModal from '@/components/ReceiptModal'
 import TransactionDetailModal from '@/components/TransactionDetailModal'
 import AppInfo from '@/components/AppInfo'
+import NotificationModal from '@/components/NotificationModal'
+
 
 /**
  * The main app component that renders the sidebar, navigation, and content based on the current tab.
@@ -33,8 +38,6 @@ export default function PersonalBankingApp() {
     const [showReceiptModal, setShowReceiptModal] = useState(false)
     const [showTransactionDetailModal, setShowTransactionDetailModal] = useState(false)
     const [selectedTransaction, setSelectedTransaction] = useState(null)
-    const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false)
-    const [showTermsOfService, setShowTermsOfService] = useState(false)
     const [isSheetOpen, setIsSheetOpen] = useState(false)
     const [chartPeriod, setChartPeriod] = useState('week')
     const [chartAccount, setChartAccount] = useState('checking')
@@ -69,6 +72,8 @@ export default function PersonalBankingApp() {
     const [selectedNotification, setSelectedNotification] = useState(null)
     const [showNotificationDetails, setShowNotificationDetails] = useState(false)
 
+    const unreadCount = notifications.filter(notification => !notification.read).length
+
     const handleLogin = () => setIsLoggedIn(true)
     const handleLogout = () => {
         setIsLoggedIn(false)
@@ -95,7 +100,7 @@ export default function PersonalBankingApp() {
         setShowNotificationDetails(true)
     }
 
-    /*useEffect(() => {
+    useEffect(() => {
         let timer
         if (showNotificationDetails && selectedNotification) {
             timer = setTimeout(() => {
@@ -103,9 +108,9 @@ export default function PersonalBankingApp() {
             }, 2000)
         }
         return () => clearTimeout(timer)
-    }, [showNotificationDetails, selectedNotification])*/
+    }, [showNotificationDetails, selectedNotification])
 
-    const unreadCount = notifications.filter(notification => !notification.read).length
+
 
 
     const renderContent = () => {
@@ -180,7 +185,7 @@ export default function PersonalBankingApp() {
             <Sidebar activeTab={activeTab} setActiveTab={(tab) => {
                 setActiveTab(tab)
                 setIsSheetOpen(false)
-                }} className="hidden lg:block" />
+            }} className="hidden lg:block" />
             <div className="flex flex-1 flex-col overflow-hidden">
                 <header className="bg-white shadow-sm">
                     <div className="flex items-center justify-between px-6 py-4">
@@ -194,20 +199,56 @@ export default function PersonalBankingApp() {
                                     </Button>
                                 </SheetTrigger>
                                 <SheetContent side="left" className="w-64 p-0">
-                                    <Sidebar 
-                                        activeTab={activeTab} 
-                                        setActiveTab={ (tab) => {
+                                    <Sidebar
+                                        activeTab={activeTab}
+                                        setActiveTab={(tab) => {
                                             setActiveTab(tab)
                                             setIsSheetOpen(false)
-                                        }} 
+                                        }}
                                     />
                                 </SheetContent>
                             </Sheet>
-                            <Button variant="ghost" size="icon">
-                                <Bell className="h-5 w-5" />
-                                <span className="sr-only">Notifications</span>
-                            </Button>
-                            <Button variant="ghost" size="icon">
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="relative">
+                                        <Bell className="h-5 w-5" />
+                                        {unreadCount > 0 && (
+                                            <Badge className="absolute -top-1 -right-1 px-1 min-w-[1.25rem] h-5 flex items-center justify-center">
+                                                {unreadCount}
+                                            </Badge>
+                                        )}
+                                        <span className="sr-only">Notifications</span>
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-80">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <h3 className="font-semibold">Notifications</h3>
+                                        <Button variant="ghost" size="sm" onClick={handleMarkAllAsRead}>
+                                            Mark all as read
+                                        </Button>
+                                    </div>
+                                    <ScrollArea className="h-[300px]">
+                                        {notifications.map((notification) => (
+                                            <div
+                                                key={notification.id}
+                                                className={`p-2 ${notification.read ? 'opacity-50' : ''} cursor-pointer hover:bg-gray-100`}
+                                                onClick={() => handleNotificationClick(notification)}
+                                            >
+                                                <div className="flex justify-between items-start">
+                                                    <p className="text-sm">{notification.message}</p>
+                                                    {!notification.read && (
+                                                        <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); handleMarkAsRead(notification.id); }}>
+                                                            <Check className="h-4 w-4" />
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                                <p className="text-xs text-gray-500">{notification.timestamp}</p>
+                                            </div>
+                                        ))}
+                                    </ScrollArea>
+                                </PopoverContent>
+                            </Popover>
+                            <Button variant="ghost" size="icon" onClick={() => setShowProfileModal(true)}>
                                 <User className="h-5 w-5" />
                                 <span className="sr-only">User profile</span>
                             </Button>
@@ -246,6 +287,12 @@ export default function PersonalBankingApp() {
                 show={showTransactionDetailModal}
                 onClose={() => setShowTransactionDetailModal(false)}
                 transaction={selectedTransaction}
+            />
+
+            <NotificationModal
+                show={showNotificationDetails}
+                onClose={() => setShowNotificationDetails(false)}
+                notification={selectedNotification}
             />
         </div>
     )

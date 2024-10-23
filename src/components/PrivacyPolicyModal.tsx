@@ -8,7 +8,7 @@ interface PrivacyPolicyModalProps {
 }
 
 
-export default function PrivacyPolicy({show, onClose}:PrivacyPolicyModalProps) {
+export default function PrivacyPolicyModal({show, onClose}:PrivacyPolicyModalProps) {
 
   return (
     <Dialog open={show} onOpenChange={onClose}>
