@@ -1,5 +1,4 @@
-import Image from "next/image";
-import PersonalBankingApp from "@/app/PersonalBankingApp";
+import PersonalBankingApp from "@/app/App";
 
 
 export default function Home() {
