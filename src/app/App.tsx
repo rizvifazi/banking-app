@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react'
-import { Bell, User, LogOut, Menu , Check} from 'lucide-react'
+import { Bell, User, LogOut, Menu, Check } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -20,7 +20,7 @@ import ReceiptModal from '@/components/ReceiptModal'
 import TransactionDetailModal from '@/components/TransactionDetailModal'
 import AppInfo from '@/components/AppInfo'
 import NotificationModal from '@/components/NotificationModal'
-
+import ProfileModal from '@/components/ProfileModal'
 
 /**
  * The main app component that renders the sidebar, navigation, and content based on the current tab.
@@ -39,8 +39,8 @@ export default function PersonalBankingApp() {
     const [showTransactionDetailModal, setShowTransactionDetailModal] = useState(false)
     const [selectedTransaction, setSelectedTransaction] = useState(null)
     const [isSheetOpen, setIsSheetOpen] = useState(false)
-    const [chartPeriod, setChartPeriod] = useState('week')
-    const [chartAccount, setChartAccount] = useState('checking')
+    //const [chartPeriod, setChartPeriod] = useState('week')
+    //const [chartAccount, setChartAccount] = useState('checking')
 
 
 
@@ -110,9 +110,6 @@ export default function PersonalBankingApp() {
         return () => clearTimeout(timer)
     }, [showNotificationDetails, selectedNotification])
 
-
-
-
     const renderContent = () => {
         switch (activeTab) {
             case 'dashboard':
@@ -146,8 +143,8 @@ export default function PersonalBankingApp() {
         setShowOTPModal(true)
     }
 
-    const handleOTPSubmit = (enteredOTP) => {
-        if (enteredOTP === '12345') {
+    const handleOTPSubmit = (enteredOTP: number) => {
+        if (enteredOTP === 12345) {
             setShowOTPModal(false)
             setShowReceiptModal(true)
             const newTransaction = {
@@ -175,6 +172,22 @@ export default function PersonalBankingApp() {
         setSelectedTransaction(transaction)
         setShowTransactionDetailModal(true)
     }
+
+    const handleProfileUpdate = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault()
+        const formData = new FormData(event.currentTarget)
+        const updatedProfile = Object.fromEntries(formData.entries())
+        setUserProfile(prevProfile => ({ ...prevProfile, ...updatedProfile }))
+        setShowProfileModal(false)
+    }
+
+    const handlePasswordReset = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault()
+        // Implement password reset logic here
+        alert('Password reset functionality to be implemented')
+        setShowProfileModal(false)
+    }
+
 
     if (!isLoggedIn) {
         return <LoginForm onLogin={handleLogin} />
@@ -293,6 +306,16 @@ export default function PersonalBankingApp() {
                 show={showNotificationDetails}
                 onClose={() => setShowNotificationDetails(false)}
                 notification={selectedNotification}
+            />
+
+            <ProfileModal
+                show={showProfileModal}
+                onClose={() => setShowProfileModal(false)}
+                userProfile={userProfile}
+                profileTab={profileTab}
+                setProfileTab={setProfileTab}
+                handleProfileUpdate={handleProfileUpdate}
+                handlePasswordReset={handlePasswordReset}
             />
         </div>
     )
