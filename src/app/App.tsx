@@ -21,6 +21,7 @@ import TransactionDetailModal from '@/components/TransactionDetailModal'
 import AppInfo from '@/components/AppInfo'
 import NotificationModal from '@/components/NotificationModal'
 import ProfileModal from '@/components/ProfileModal'
+import ForgetPasswordModal from '@/components/ForgetPasswordModal'
 
 /**
  * The main app component that renders the sidebar, navigation, and content based on the current tab.
@@ -39,6 +40,8 @@ export default function PersonalBankingApp() {
     const [showTransactionDetailModal, setShowTransactionDetailModal] = useState(false)
     const [selectedTransaction, setSelectedTransaction] = useState(null)
     const [isSheetOpen, setIsSheetOpen] = useState(false)
+    const [showForgetPasswordModal, setShowForgetPasswordModal] = useState(false)
+    const [forgotPasswordEmail, setForgotPasswordEmail] = useState('')
     //const [chartPeriod, setChartPeriod] = useState('week')
     //const [chartAccount, setChartAccount] = useState('checking')
 
@@ -79,6 +82,23 @@ export default function PersonalBankingApp() {
         setIsLoggedIn(false)
         setActiveTab('dashboard')
     }
+
+    //Below code is for Password Reset Functionality
+    const handleForgotPassword = (email: string) => {
+        setForgotPasswordEmail(email)
+        setShowForgetPasswordModal(true)
+    }
+
+    const handleForgetPasswordSubmit = (answers: string[]) => {
+        // Here you would typically verify the answers against the stored security questions
+        // For this example, we'll just assume they're correct
+        setShowForgetPasswordModal(false)
+        setIsLoggedIn(true)
+        setShowProfileModal(true)
+        setProfileTab('security')
+    }
+
+
 
     // Below snippet is for Notifications
     const handleMarkAsRead = (id: number) => {
@@ -143,8 +163,8 @@ export default function PersonalBankingApp() {
         setShowOTPModal(true)
     }
 
-    const handleOTPSubmit = (enteredOTP: number) => {
-        if (enteredOTP === 12345) {
+    const handleOTPSubmit = (enteredOTP) => {
+        if (enteredOTP === "12345") {
             setShowOTPModal(false)
             setShowReceiptModal(true)
             const newTransaction = {
@@ -190,7 +210,38 @@ export default function PersonalBankingApp() {
 
 
     if (!isLoggedIn) {
-        return <LoginForm onLogin={handleLogin} />
+        return (
+            <>
+                <LoginForm
+                    onLogin={handleLogin}
+                    onRegister={(userData) => {
+                        // Handle user registration here
+                        console.log('User registered:', userData)
+                        setUserProfile({
+                            fullName: userData.name,
+                            primaryEmail: userData.email,
+                            secondaryEmail: '', // add this
+                            phone: '', // add this
+                            secondaryPhone: '', // add this
+                            address: '', // add this
+                            adharId: userData.adharId,
+                        })
+                        handleLogin()
+                    }}
+                    onForgotPassword={handleForgotPassword}
+                />
+                <ForgetPasswordModal
+                    show={showForgetPasswordModal}
+                    onClose={() => setShowForgetPasswordModal(false)}
+                    onSubmit={handleForgetPasswordSubmit}
+                    securityQuestions={[
+                        "What was the name of your first pet?",
+                        "In what city were you born?",
+                        "What is your mother's maiden name?"
+                    ]}
+                />
+            </>
+        )
     }
 
     return (
