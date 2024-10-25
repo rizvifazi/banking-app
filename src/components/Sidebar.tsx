@@ -1,4 +1,4 @@
-import { Home, CreditCard, DollarSign, PieChart, Phone, Info } from 'lucide-react'
+import { Home, Users, DollarSign, PieChart, Phone, Info } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 
 export default function Sidebar({ activeTab, setActiveTab, className = "" }: { activeTab: string, setActiveTab: (tab: string) => void, className?: string }) {
@@ -19,7 +19,7 @@ export default function Sidebar({ activeTab, setActiveTab, className = "" }: { a
     <aside className={`w-64 bg-white p-6 shadow-md ${className}`}>
       <nav className="space-y-2">
         <NavItem icon={Home} label="Dashboard" />
-        <NavItem icon={CreditCard} label="Accounts" />
+        <NavItem icon={Users} label="Beneficiaries" />
         <NavItem icon={DollarSign} label="Payments" />
         <NavItem icon={PieChart} label="Investments" />
         <NavItem icon={Phone} label="Contact" />

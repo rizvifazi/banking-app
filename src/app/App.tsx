@@ -10,7 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import LoginForm from '@/components/LoginForm'
 import Sidebar from '@/components/Sidebar'
 import Dashboard from '@/components/Dashboard'
-import Accounts from '@/components/Accounts'
+import Accounts from '@/components/Beneficiaries'
 import Payments from '@/components/Payments'
 import Investments from '@/components/Investments'
 import Contact from '@/components/Contact'
