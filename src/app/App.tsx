@@ -10,7 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import LoginForm from '@/components/LoginForm'
 import Sidebar from '@/components/Sidebar'
 import Dashboard from '@/components/Dashboard'
-import Accounts from '@/components/Beneficiaries'
+import Beneficiaries from '@/components/Beneficiaries'
 import Payments from '@/components/Payments'
 import Investments from '@/components/Investments'
 import Contact from '@/components/Contact'
@@ -134,8 +134,8 @@ export default function PersonalBankingApp() {
         switch (activeTab) {
             case 'dashboard':
                 return <Dashboard transactions={transactions} onTransactionClick={handleTransactionClick} />
-            case 'accounts':
-                return <Accounts />
+            case 'beneficiaries':
+                return <Beneficiaries />
             case 'payments':
                 return <Payments
                     transactions={transactions}
