@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -17,6 +17,13 @@ interface Beneficiary {
   accountNumber: string
 }
 
+interface BeneficiariesProps {
+  beneficiaries: Beneficiary[]
+  onAddBeneficiary: (beneficiary: Omit<Beneficiary, 'id'>) => void
+  onEditBeneficiary: (beneficiary: Beneficiary) => void
+  onDeleteBeneficiary: (id: number) => void
+}
+
 // This should be imported from your Payments module
 const bankList = [
   "Bank of America",
@@ -31,8 +38,7 @@ const bankList = [
   "State Street Corporation"
 ]
 
-export default function Beneficiaries() {
-  const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([])
+export default function Beneficiaries({ beneficiaries, onAddBeneficiary, onEditBeneficiary, onDeleteBeneficiary }: BeneficiariesProps) {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -64,11 +70,7 @@ export default function Beneficiaries() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const newBeneficiary = {
-      id: Date.now(),
-      ...formData
-    }
-    setBeneficiaries(prev => [...prev, newBeneficiary])
+    onAddBeneficiary(formData)
     resetForm()
   }
 
@@ -81,9 +83,7 @@ export default function Beneficiaries() {
   const handleEditSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (editingBeneficiary) {
-      setBeneficiaries(prev =>
-        prev.map(b => b.id === editingBeneficiary.id ? { ...editingBeneficiary, ...formData } : b)
-      )
+      onEditBeneficiary({ ...editingBeneficiary, ...formData })
       setIsEditModalOpen(false)
       setEditingBeneficiary(null)
     }
@@ -96,7 +96,7 @@ export default function Beneficiaries() {
 
   const confirmDelete = () => {
     if (beneficiaryToDelete) {
-      setBeneficiaries(prev => prev.filter(b => b.id !== beneficiaryToDelete.id))
+      onDeleteBeneficiary(beneficiaryToDelete.id)
       setIsDeleteModalOpen(false)
       setBeneficiaryToDelete(null)
     }

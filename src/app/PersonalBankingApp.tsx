@@ -479,6 +479,8 @@ export default function PersonalBankingApp() {
                   </nav>
                 </SheetContent>
               </Sheet>
+
+              {/* Notifications */}
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="ghost" size="icon" className="relative">
@@ -618,7 +620,7 @@ export default function PersonalBankingApp() {
       <Dialog open={showPrivacyPolicy} onOpenChange={setShowPrivacyPolicy}>
         <DialogContent className="sm:max-w-[600px] max-h-[80vh]">
           <DialogHeader>
-            <Dialog Title>Privacy Policy</DialogTitle>
+            <DialogTitle>Privacy Policy</DialogTitle>
           </DialogHeader>
           <ScrollArea className="h-[60vh] pr-4">
             <div className="space-y-4">

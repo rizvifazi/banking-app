@@ -1,12 +1,31 @@
-import { useState } from 'react'
+import { useState} from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-export default function Payments({ transactions, onPayment, onTransactionClick }: { transactions: any[], onPayment: (details: any) => void, onTransactionClick: (transaction: any) => void }) {
+interface Beneficiary {
+  id: number
+  firstName: string
+  lastName: string
+  bankName: string
+  accountNumber: string
+}
+
+interface PaymentsProps {
+  transactions: any[], 
+  onPayment: (details: any) => void, 
+  onTransactionClick: (transaction: any) => void,
+  beneficiaries: Beneficiary[]
+}
+
+export default function Payments({ transactions, onPayment, onTransactionClick, beneficiaries }: PaymentsProps) {
+  const [paymentType, setPaymentType] = useState('inter-bank')
   const [recipientName, setRecipientName] = useState('')
+  const [recipientBank, setRecipientBank] = useState('')
+  const [accountNumber, setAccountNumber] = useState('')
+  const [selectedBeneficiary, setSelectedBeneficiary] = useState<Beneficiary | null>(null)
 
   const banks = [
     'Chase Bank',
@@ -16,33 +35,59 @@ export default function Payments({ transactions, onPayment, onTransactionClick }
     'US Bank',
   ]
 
+  const utilityTypes = [
+    'Electricity Board',
+    'Water Board',
+    'Telecom',
+    'Cable TV',
+  ]
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount)
+  }
+
+  const handlePaymentTypeChange = (value: string) => {
+    setPaymentType(value)
+    setRecipientName('')
+    setRecipientBank('')
+    setAccountNumber('')
+    setSelectedBeneficiary(null)
+
+    if (value === 'intra-bank') {
+      setRecipientBank('ABC Bank')
+    }
+  }
+
+  const handleBeneficiaryChange = (value: string) => {
+    const beneficiary = beneficiaries.find(b => `${b.firstName} ${b.lastName}` === value)
+    if (beneficiary) {
+      setSelectedBeneficiary(beneficiary)
+      setRecipientName(`${beneficiary.firstName} ${beneficiary.lastName}`)
+      setRecipientBank(beneficiary.bankName)
+      setAccountNumber(beneficiary.accountNumber)
+    }
+  }
+
+  const handleUtilityTypeChange = (value: string) => {
+    setRecipientBank(value)
+    setRecipientName(value)
   }
 
   const handlePayment = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const form = event.currentTarget
     const details = {
-      
+      paymentType,
       fromAccount: (form.fromAccount as HTMLSelectElement).value,
       amount: parseFloat((form.amount as HTMLInputElement).value),
-      recipientBank: (form.recipientBank as HTMLSelectElement).value,
-      accountNumber: (form.accountNumber as HTMLInputElement).value,
-      recipientName: (form.recipientName as HTMLInputElement).value,
+      recipientBank: recipientBank,
+      accountNumber: accountNumber,
+      recipientName: recipientName,
       description: (form.description as HTMLInputElement).value,
       date: new Date().toLocaleString(),
       modeOfTransaction: 'Online Transfer'
     }
     onPayment(details)
-  }
-
-  const handleRecipientNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const name = event.target.value
-    const obscuredName = name.split(' ').map(part => 
-      part.charAt(0) + '*'.repeat(part.length - 1)
-    ).join(' ')
-    setRecipientName(obscuredName)
   }
 
   return (
@@ -73,35 +118,97 @@ export default function Payments({ transactions, onPayment, onTransactionClick }
                 <Input id="amount" name="amount" type="number" step="0.01" placeholder="Enter amount" required />
               </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="recipient-bank">Recipient's Bank</Label>
-              <Select name="recipientBank">
-                <SelectTrigger id="recipient-bank">
-                  <SelectValue placeholder="Select bank" />
-                </SelectTrigger>
-                <SelectContent>
-                  {banks.map((bank, index) => (
-                    <SelectItem key={index} value={bank.toLowerCase().replace(/\s+/g, '-')}>
-                      {bank}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="payment-type">Payment Type</Label>
+                <Select name="paymentType" value={paymentType} onValueChange={handlePaymentTypeChange}>
+                  <SelectTrigger id="payment-type">
+                    <SelectValue placeholder="Select payment type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="beneficiary">Beneficiary</SelectItem>
+                    <SelectItem value="intra-bank">Intra-bank</SelectItem>
+                    <SelectItem value="inter-bank">Inter-bank</SelectItem>
+                    <SelectItem value="utility">Utility</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="recipient-bank">
+                  {paymentType === 'utility' ? "Utility Account Type" : "Recipient's Bank"}
+                </Label>
+                {paymentType === 'utility' ? (
+                  <Select name="utilityType" value={recipientBank} onValueChange={handleUtilityTypeChange}>
+                    <SelectTrigger id="utility-type">
+                      <SelectValue placeholder="Select utility type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {utilityTypes.map((type, index) => (
+                        <SelectItem key={index} value={type}>
+                          {type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Select 
+                    name="recipientBank" 
+                    value={recipientBank} 
+                    onValueChange={setRecipientBank}
+                    disabled={paymentType === 'beneficiary' || paymentType === 'intra-bank'}
+                  >
+                    <SelectTrigger id="recipient-bank">
+                      <SelectValue placeholder="Select bank" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {banks.map((bank, index) => (
+                        <SelectItem key={index} value={bank}>
+                          {bank}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="account-number">Account Number</Label>
-              <Input id="account-number" name="accountNumber" placeholder="Enter account number" required />
+              <Input 
+                id="account-number" 
+                name="accountNumber" 
+                placeholder="Enter account number" 
+                value={accountNumber}
+                onChange={(e) => setAccountNumber(e.target.value)}
+                disabled={paymentType === 'beneficiary'}
+                required 
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="recipient-name">Recipient's Name</Label>
-              <Input 
-                id="recipient-name" 
-                name="recipientName" 
-                placeholder="Enter recipient's name" 
-                onChange={handleRecipientNameChange}
-                value={recipientName}
-                required 
-              />
+              {paymentType === 'beneficiary' ? (
+                <Select name="beneficiary" value={recipientName} onValueChange={handleBeneficiaryChange}>
+                  <SelectTrigger id="beneficiary">
+                    <SelectValue placeholder="Select beneficiary" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {beneficiaries.map((beneficiary) => (
+                      <SelectItem key={beneficiary.id} value={`${beneficiary.firstName} ${beneficiary.lastName}`}>
+                        {`${beneficiary.firstName} ${beneficiary.lastName}`}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input 
+                  id="recipient-name" 
+                  name="recipientName" 
+                  placeholder="Enter recipient's name" 
+                  value={recipientName}
+                  onChange={(e) => setRecipientName(e.target.value)}
+                  disabled={paymentType === 'utility'}
+                  required 
+                />
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>

@@ -23,6 +23,15 @@ import NotificationModal from '@/components/NotificationModal'
 import ProfileModal from '@/components/ProfileModal'
 import ForgetPasswordModal from '@/components/ForgetPasswordModal'
 
+interface Beneficiary {
+    id: number
+    firstName: string
+    lastName: string
+    bankName: string
+    accountNumber: string
+  }
+  
+
 /**
  * The main app component that renders the sidebar, navigation, and content based on the current tab.
  *
@@ -40,12 +49,18 @@ export default function PersonalBankingApp() {
     const [showTransactionDetailModal, setShowTransactionDetailModal] = useState(false)
     const [selectedTransaction, setSelectedTransaction] = useState(null)
     const [isSheetOpen, setIsSheetOpen] = useState(false)
-    const [showForgetPasswordModal, setShowForgetPasswordModal] = useState(false)
-    const [forgotPasswordEmail, setForgotPasswordEmail] = useState('')
     //const [chartPeriod, setChartPeriod] = useState('week')
     //const [chartAccount, setChartAccount] = useState('checking')
-
-
+    const [showForgetPasswordModal, setShowForgetPasswordModal] = useState(false)
+    const [forgotPasswordEmail, setForgotPasswordEmail] = useState('')
+  const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([
+    { id: 1, firstName: "John", lastName: "Doe", bankName: "Bank of America", accountNumber: "12345678" },
+    { id: 2, firstName: "Jane", lastName: "Smith", bankName: "JPMorgan Chase", accountNumber: "23456789" },
+    { id: 3, firstName: "Michael", lastName: "Johnson", bankName: "Wells Fargo", accountNumber: "34567890" },
+    { id: 4, firstName: "Emily", lastName: "Brown", bankName: "Citibank", accountNumber: "45678901" },
+    { id: 5, firstName: "David", lastName: "Wilson", bankName: "U.S. Bank", accountNumber: "56789012" },
+    { id: 6, firstName: "Sarah", lastName: "Taylor", bankName: "PNC Bank", accountNumber: "67890123" },
+  ])
 
     const [transactions, setTransactions] = useState([
         { id: 1, description: 'Grocery Store', amount: -85.20, date: '2023-04-15', type: 'debit', fromAccount: 'Checking Account', recipientName: 'Local Supermarket', modeOfTransaction: 'Card Payment' },
@@ -130,17 +145,46 @@ export default function PersonalBankingApp() {
         return () => clearTimeout(timer)
     }, [showNotificationDetails, selectedNotification])
 
+    // Add these functions to manage beneficiaries
+  const handleAddBeneficiary = (newBeneficiary: Omit<Beneficiary, 'id'>) => {
+    setBeneficiaries(prev => [...prev, { ...newBeneficiary, id: Date.now() }])
+  }
+
+  const handleEditBeneficiary = (updatedBeneficiary: Beneficiary) => {
+    setBeneficiaries(prev => prev.map(b => b.id === updatedBeneficiary.id ? updatedBeneficiary : b))
+  }
+
+  const handleDeleteBeneficiary = (id: number) => {
+    setBeneficiaries(prev => prev.filter(b => b.id !== id))
+  }
+
+  const handlePayment = (details: any) => {
+    setPaymentDetails(details)
+    setShowSummaryModal(true)
+  }
+
+  const handleTransactionClick = (transaction: any) => {
+    setSelectedTransaction(transaction)
+    setShowTransactionDetailModal(true)
+  }
+
     const renderContent = () => {
         switch (activeTab) {
             case 'dashboard':
                 return <Dashboard transactions={transactions} onTransactionClick={handleTransactionClick} />
             case 'beneficiaries':
-                return <Beneficiaries />
+                return <Beneficiaries 
+                    beneficiaries={beneficiaries}
+                    onAddBeneficiary={handleAddBeneficiary}
+                    onEditBeneficiary={handleEditBeneficiary}
+                    onDeleteBeneficiary={handleDeleteBeneficiary}
+                />
             case 'payments':
                 return <Payments
                     transactions={transactions}
                     onPayment={handlePayment}
                     onTransactionClick={handleTransactionClick}
+                    beneficiaries={beneficiaries}
                 />
             case 'investments':
                 return <Investments />
@@ -151,11 +195,6 @@ export default function PersonalBankingApp() {
             default:
                 return <div className="text-2xl font-bold">Page not found</div>
         }
-    }
-
-    const handlePayment = (details) => {
-        setPaymentDetails(details)
-        setShowSummaryModal(true)
     }
 
     const handleProceed = () => {
@@ -186,11 +225,6 @@ export default function PersonalBankingApp() {
     const handleCloseReceipt = () => {
         setShowReceiptModal(false)
         setPaymentDetails(null)
-    }
-
-    const handleTransactionClick = (transaction) => {
-        setSelectedTransaction(transaction)
-        setShowTransactionDetailModal(true)
     }
 
     const handleProfileUpdate = (event: React.FormEvent<HTMLFormElement>) => {
