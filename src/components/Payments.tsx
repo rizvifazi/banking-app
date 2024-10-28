@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface Beneficiary {
   id: number
@@ -26,13 +27,20 @@ export default function Payments({ transactions, onPayment, onTransactionClick, 
   const [recipientBank, setRecipientBank] = useState('')
   const [accountNumber, setAccountNumber] = useState('')
   const [selectedBeneficiary, setSelectedBeneficiary] = useState<Beneficiary | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const transactionsPerPage = 10
 
   const banks = [
-    'Chase Bank',
-    'Bank of America',
-    'Wells Fargo',
-    'Citibank',
-    'US Bank',
+    "Bank of America",
+    "JPMorgan Chase",
+    "Wells Fargo",
+    "Citibank",
+    "U.S. Bank",
+    "PNC Bank",
+    "Capital One",
+    "TD Bank",
+    "Bank of New York Mellon",
+    "State Street Corporation"
   ]
 
   const utilityTypes = [
@@ -88,6 +96,80 @@ export default function Payments({ transactions, onPayment, onTransactionClick, 
       modeOfTransaction: 'Online Transfer'
     }
     onPayment(details)
+  }
+
+  // Pagination logic
+  const indexOfLastTransaction = currentPage * transactionsPerPage
+  const indexOfFirstTransaction = indexOfLastTransaction - transactionsPerPage
+  const currentTransactions = transactions.slice(indexOfFirstTransaction, indexOfLastTransaction)
+  const totalPages = Math.ceil(transactions.length / transactionsPerPage)
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber)
+
+  const renderPageNumbers = () => {
+    const pageNumbers = []
+    const maxVisiblePages = 5
+
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(
+          <Button
+            key={i}
+            onClick={() => paginate(i)}
+            variant={currentPage === i ? "default" : "outline"}
+            size="sm"
+            className="mx-1"
+          >
+            {i}
+          </Button>
+        )
+      }
+    } else {
+      let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2))
+      let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1)
+
+      if (endPage - startPage < maxVisiblePages - 1) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1)
+      }
+
+      if (startPage > 1) {
+        pageNumbers.push(
+          <Button key="start" onClick={() => paginate(1)} variant="outline" size="sm" className="mx-1">
+            1
+          </Button>
+        )
+        if (startPage > 2) {
+          pageNumbers.push(<span key="ellipsis1" className="mx-1">...</span>)
+        }
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        pageNumbers.push(
+          <Button
+            key={i}
+            onClick={() => paginate(i)}
+            variant={currentPage === i ? "default" : "outline"}
+            size="sm"
+            className="mx-1"
+          >
+            {i}
+          </Button>
+        )
+      }
+
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          pageNumbers.push(<span key="ellipsis2" className="mx-1">...</span>)
+        }
+        pageNumbers.push(
+          <Button key="end" onClick={() => paginate(totalPages)} variant="outline" size="sm" className="mx-1">
+            {totalPages}
+          </Button>
+        )
+      }
+    }
+
+    return pageNumbers
   }
 
   return (
@@ -234,7 +316,7 @@ export default function Payments({ transactions, onPayment, onTransactionClick, 
               </tr>
             </thead>
             <tbody>
-              {transactions.map((transaction) => (
+              {currentTransactions.map((transaction) => (
                 <tr key={transaction.id} className="border-b last:border-b-0 cursor-pointer hover:bg-gray-100" onClick={() => onTransactionClick(transaction)}>
                   <td className="p-4">{transaction.description}</td>
                   <td className={`text-right p-4 ${transaction.amount < 0 ? 'text-red-500' : 'text-green-500'}`}>
@@ -246,6 +328,27 @@ export default function Payments({ transactions, onPayment, onTransactionClick, 
               ))}
             </tbody>
           </table>
+          <div className="flex justify-center items-center p-4 space-x-2">
+            <Button
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+              variant="outline"
+              size="sm"
+            >
+              <ChevronLeft className="h-4 w-4 mr-2" />
+              Previous
+            </Button>
+            {renderPageNumbers()}
+            <Button
+              onClick={() => paginate(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              variant="outline"
+              size="sm"
+            >
+              Next
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

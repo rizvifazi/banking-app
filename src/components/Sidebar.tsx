@@ -1,4 +1,4 @@
-import { Home, Users, DollarSign, PieChart, Phone, Info } from 'lucide-react'
+import { Home, Users, DollarSign, PieChart, Phone, Info, FileText } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 
 export default function Sidebar({ activeTab, setActiveTab, className = "" }: { activeTab: string, setActiveTab: (tab: string) => void, className?: string }) {
@@ -22,6 +22,7 @@ export default function Sidebar({ activeTab, setActiveTab, className = "" }: { a
         <NavItem icon={Users} label="Beneficiaries" />
         <NavItem icon={DollarSign} label="Payments" />
         <NavItem icon={PieChart} label="Investments" />
+        <NavItem icon={FileText} label="Reports" />
         <NavItem icon={Phone} label="Contact" />
         <NavItem icon={Info} label="App Info" />
       </nav>

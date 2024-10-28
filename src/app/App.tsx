@@ -13,6 +13,7 @@ import Dashboard from '@/components/Dashboard'
 import Beneficiaries from '@/components/Beneficiaries'
 import Payments from '@/components/Payments'
 import Investments from '@/components/Investments'
+import Reports from '@/components/Reports'
 import Contact from '@/components/Contact'
 import PaymentSummaryModal from '@/components/PaymentSummaryModal'
 import OTPModal from '@/components/OTPModal'
@@ -67,6 +68,26 @@ export default function PersonalBankingApp() {
         { id: 2, description: 'Salary Deposit', amount: 3000.00, date: '2023-04-14', type: 'credit', fromAccount: 'External Transfer', recipientName: 'Your Name', modeOfTransaction: 'Direct Deposit' },
         { id: 3, description: 'Electric Bill', amount: -120.50, date: '2023-04-13', type: 'debit', fromAccount: 'Checking Account', recipientName: 'Electric Company', modeOfTransaction: 'Online Transfer' },
         { id: 4, description: 'Online Shopping', amount: -65.99, date: '2023-04-12', type: 'debit', fromAccount: 'Credit Card', recipientName: 'Online Retailer', modeOfTransaction: 'Card Payment' },
+        { id: 5, description: 'Groceries', amount: -75.32, date: '2024-10-02', type: 'debit', fromAccount: 'Checking Account', recipientName: 'Local Market', modeOfTransaction: 'Card Payment' },
+        { id: 6, description: 'Rent Payment', amount: -1200.00, date: '2024-10-05', type: 'debit', fromAccount: 'Checking Account', recipientName: 'Landlord', modeOfTransaction: 'Online Transfer' },
+        { id: 7, description: 'Salary Deposit', amount: 2850.00, date: '2024-10-08', type: 'credit', fromAccount: 'External Transfer', recipientName: 'Your Name', modeOfTransaction: 'Direct Deposit' },
+        { id: 8, description: 'Dining Out', amount: -45.75, date: '2024-10-10', type: 'debit', fromAccount: 'Credit Card', recipientName: 'Restaurant', modeOfTransaction: 'Card Payment' },
+        { id: 9, description: 'Online Shopping', amount: -92.18, date: '2024-10-12', type: 'debit', fromAccount: 'Credit Card', recipientName: 'E-commerce Store', modeOfTransaction: 'Card Payment' },
+        { id: 10, description: 'Gas Bill', amount: -85.20, date: '2024-10-15', type: 'debit', fromAccount: 'Checking Account', recipientName: 'Gas Company', modeOfTransaction: 'Online Payment' },
+        { id: 11, description: 'Groceries', amount: -68.94, date: '2024-10-17', type: 'debit', fromAccount: 'Checking Account', recipientName: 'Local Market', modeOfTransaction: 'Card Payment' },
+        { id: 12, description: 'Phone Bill', amount: -55.00, date: '2024-10-19', type: 'debit', fromAccount: 'Checking Account', recipientName: 'Phone Company', modeOfTransaction: 'Auto-Payment' },
+        { id: 13, description: 'Cash Withdrawal', amount: -200.00, date: '2024-10-20', type: 'debit', fromAccount: 'Checking Account', recipientName: 'ATM', modeOfTransaction: 'ATM Withdrawal' },
+        { id: 14, description: 'Online Course', amount: -129.99, date: '2024-10-22', type: 'debit', fromAccount: 'Credit Card', recipientName: 'Education Platform', modeOfTransaction: 'Card Payment' },
+        { id: 15, description: 'Car Payment', amount: -350.00, date: '2024-10-24', type: 'debit', fromAccount: 'Checking Account', recipientName: 'Car Loan Company', modeOfTransaction: 'Auto-Payment' },
+        { id: 16, description: 'Groceries', amount: -72.45, date: '2024-10-26', type: 'debit', fromAccount: 'Checking Account', recipientName: 'Local Market', modeOfTransaction: 'Card Payment' },
+        { id: 17, description: 'Entertainment', amount: -35.00, date: '2024-10-27', type: 'debit', fromAccount: 'Credit Card', recipientName: 'Movie Theater', modeOfTransaction: 'Card Payment' },
+        { id: 18, description: 'Bonus Deposit', amount: 500.00, date: '2024-10-28', type: 'credit', fromAccount: 'External Transfer', recipientName: 'Your Name', modeOfTransaction: 'Direct Deposit' },
+        { id: 19, description: 'Online Shopping', amount: -87.32, date: '2024-10-29', type: 'debit', fromAccount: 'Credit Card', recipientName: 'E-commerce Store', modeOfTransaction: 'Card Payment' },
+        { id: 20, description: 'Gift Purchase', amount: -120.00, date: '2024-10-30', type: 'debit', fromAccount: 'Credit Card', recipientName: 'Gift Shop', modeOfTransaction: 'Card Payment' },
+        { id: 21, description: 'Dividend Deposit', amount: 25.50, date: '2024-10-03', type: 'credit', fromAccount: 'Investment Account', recipientName: 'Investment Firm', modeOfTransaction: 'Direct Deposit' },
+        { id: 22, description: 'Insurance Payment', amount: -150.00, date: '2024-10-11', type: 'debit', fromAccount: 'Checking Account', recipientName: 'Insurance Company', modeOfTransaction: 'Auto-Payment' },
+        { id: 23, description: 'Charity Donation', amount: -50.00, date: '2024-10-16', type: 'debit', fromAccount: 'Checking Account', recipientName: 'Charity Organization', modeOfTransaction: 'Online Transfer' },
+        { id: 24, description: 'Cashback Reward', amount: 15.23, date: '2024-10-23', type: 'credit', fromAccount: 'Credit Card', recipientName: 'Credit Card Company', modeOfTransaction: 'Credit Card Adjustment' }
     ])
 
     const [userProfile, setUserProfile] = useState({
@@ -188,6 +209,8 @@ export default function PersonalBankingApp() {
                 />
             case 'investments':
                 return <Investments />
+            case 'reports':
+                return <Reports transactions={transactions} />
             case 'contact':
                 return <Contact />
             case 'app-info':
@@ -287,7 +310,7 @@ export default function PersonalBankingApp() {
             <div className="flex flex-1 flex-col overflow-hidden">
                 <header className="bg-white shadow-sm">
                     <div className="flex items-center justify-between px-6 py-4">
-                        <h1 className="text-2xl font-bold">Personal Banking</h1>
+                        <h1 className="text-2xl font-bold">ABC NetBanking Portal</h1>
                         <div className="flex items-center space-x-4">
                             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                                 <SheetTrigger asChild>
